@@ -9,23 +9,62 @@ class App extends Component {
     this.state = {
       textList :['test', '666', '233333333', 'javascript', 'html', 'css', 'Vue', 'React', 'Angular'],
       input:"",
+      domWidth: 0,
+      domHeight: 0,
     }
 
   }
 
 
-  componentDidMount () {
-    console.log(this.refs.content.style.position);
+  async componentDidMount () {
      if (this.refs.content.style.position == '' || this.refs.content.style.position == 'static'){
       this.refs.content.style.position = 'relative';
      }
      this.refs.content.style.overflow = 'hidden';
      let rect = this.refs.content.getBoundingClientRect();
+     await this.setState({
+        domWidth: rect.right - rect.left,
+        domHeight: rect.bottom - rect.top,
+     })
 
-     this.domWidth = rect.right - rect.left;
-     this.domHeight = rect.bottom - rect.top;
-    //  console.log(rect.right,rect.left,this.domWidth,this.domHeight)
+
+  // let repeat =()=>{
+  //   this.opera();
+  //   setInterval(this.opera(),10000)
+  // }
+  // repeat();
+    let opera = () =>{
+    this.state.textList.map((Element, index) => {
+      this.handleChild(Element);
+  })};
+  // opera();
+  setInterval(opera,5000)
+
   }
+
+  opera = () =>{
+    this.state.textList.map((Element, index) => {
+    this.handleChild(Element);
+  })};
+
+
+
+
+
+
+     
+
+  // let opera = () =>{
+  //   this.state.textList.map((Element, index) => {
+  //   child(Element);
+  // })};
+  // // opera();
+  // setInterval(opera,3000)
+
+
+
+
+
 
 
   handleInput =(e)=>{
@@ -37,10 +76,45 @@ class App extends Component {
   handleClick=()=>{
     this.setState({
         textList: [...this.state.textList, this.refs.userInput.value],
-        input:""
+        input:"",
+    },()=>{
+      this.state.textList.map((Element, index) => {
+        this.handleChild(Element);
+      })
     })
 
 }
+
+
+handleChild(text){
+  let div = document.createElement('div');
+  div.style.position = 'absolute';
+  div.style.left = this.state.domWidth + 'px';
+  div.style.top = (this.state.domHeight - 20) * +Math.random().toFixed(2) + 'px';
+  div.style.whiteSpace = 'nowrap';
+  div.style.color = '#' + Math.floor(Math.random() * 0xffffff).toString(16);
+  div.innerText = text;
+  this.refs.content.appendChild(div);
+  let roll = (timer) => {
+    let now = +new Date();
+    roll.last = roll.last || now;
+    roll.timer = roll.timer || timer;
+    let left = div.offsetLeft;
+    let rect = div.getBoundingClientRect();
+    if (left < (rect.left - rect.right)) {
+      // this.refs.content.removeChild(div);
+    } else {
+        if (now - roll.last >= roll.timer) {
+            roll.last = now;
+            left -= 3;
+            div.style.left = left + 'px';
+        }
+        requestAnimationFrame(roll);
+    }
+}
+roll(50 * +Math.random().toFixed(2));
+}
+
 
 // function handleClick(){
 
